@@ -313,7 +313,7 @@ def _check_meta_yml(
                     ))
 
     # Channel cross-reference: meta.yml ↔ main.nf emit names
-    main_nf_emits = set(_output_emit_names(main_nf)) - {"versions"}
+    main_nf_emits = set(_output_emit_names(main_nf)) - {"versions", "meta"}
     _, meta_out_names = _meta_yml_channel_names(data)
     meta_out_set = set(meta_out_names)
 
