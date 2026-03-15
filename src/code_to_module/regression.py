@@ -12,7 +12,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 # ── Weights (sum to 1.0) ───────────────────────────────────────────────────────
 # process name and container are the highest-value signals; keyword overlap
