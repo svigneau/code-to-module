@@ -1,0 +1,29 @@
+name: samtools/sort
+description: Sort BAM files using samtools
+tools:
+  - samtools:
+      description: Utilities for manipulating alignments in SAM/BAM/CRAM format
+      homepage: https://www.htslib.org
+      documentation: https://www.htslib.org/doc/samtools.html
+      licence: ['MIT']
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - bam:
+      type: file
+      description: Input BAM file
+      pattern: "*.bam"
+output:
+  - bam:
+      type: file
+      description: Sorted BAM file
+      pattern: "*.bam"
+  - bai:
+      type: file
+      description: BAM index file
+      pattern: "*.bai"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"

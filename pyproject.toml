@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "code-to-module"
+version = "0.1.0"
+description = "Convert scripts and Git repos into submission-ready nf-core modules"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "anthropic>=0.28",
+    "click>=8.1",
+    "gitpython>=3.1",
+    "httpx>=0.27",
+    "jinja2>=3.1",
+    "nf-core>=2.14",
+    "pydantic>=2.0",
+    "rich>=13.0",
+    "ruamel.yaml>=0.18",
+]
+
+[project.urls]
+Homepage = "https://github.com/svigneau/code-to-module"
+Issues = "https://github.com/svigneau/code-to-module/issues"
+Documentation = "https://github.com/svigneau/code-to-module#readme"
+
+[project.scripts]
+code-to-module = "code_to_module.cli:main"
+ctm-validate = "code_to_module.validate_cli:main"
+
+# ctm-validate exposes: ctm-validate test, ctm-validate fix, ctm-validate review
+# It ships in the same package but is a separate entry point so it can
+# be extracted into a standalone nf-module-tools package later.
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "pytest-mock", "ruff", "mypy"]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocs-click>=0.8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/code_to_module"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["tests"]
+markers = [
+    "integration: marks tests that require nf-core and nf-test to be installed (deselect with '-m not integration')",
+    "network: marks tests that clone real GitHub repos (deselect with '-m not network')",
+    "llm: marks tests that make real Anthropic API calls (deselect with '-m not llm')",
+    "regression: marks tests that run full convert+score against nf-core reference modules (deselect with '-m not regression')",
+]

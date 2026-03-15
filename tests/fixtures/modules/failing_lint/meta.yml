@@ -1,0 +1,20 @@
+name: samtools/sort
+description: Sort BAM files
+tools:
+  - samtools:
+      description: Utilities for manipulating alignments in SAM/BAM/CRAM format
+      homepage: https://www.htslib.org
+      documentation: https://www.htslib.org/doc/samtools.html
+      licence: ['MIT']
+input:
+  - meta:
+      type: map
+  - bam:
+      type: file
+      # CLASS_B error: missing description field
+output:
+  - bam:
+      type: file
+      # CLASS_B error: missing description field
+  - versions:
+      type: file

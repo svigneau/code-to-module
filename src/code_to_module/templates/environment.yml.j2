@@ -1,0 +1,18 @@
+{% if spec.container_source.value == 'generated_from_envyml' and spec.environment_yml_content %}
+{{ spec.environment_yml_content }}
+{% else %}
+{% set pkg = spec.conda_package or spec.tool_name %}
+name: nf-core-{{ spec.tool_name }}
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+{% if 'TODO' in pkg %}
+  # TODO: Replace with the correct Bioconda package name and version.
+  # Find it at: https://bioconda.github.io/
+  - {{ pkg }}
+{% else %}
+  - {{ pkg }}
+{% endif %}
+{% endif %}

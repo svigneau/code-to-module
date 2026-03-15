@@ -1,0 +1,178 @@
+{
+  "schema_version": "3.5.0",
+  "last_updated": "2025-01-15",
+  "update_url": "https://raw.githubusercontent.com/nf-core/nf-core-standards/main/nf_core_standards.json",
+  "valid_labels": [
+    "process_single",
+    "process_medium",
+    "process_high",
+    "process_high_memory"
+  ],
+  "label_resources": {
+    "process_single": {"cpus": 1, "memory_gb": 6, "time_h": 4},
+    "process_medium": {"cpus": 6, "memory_gb": 36, "time_h": 8},
+    "process_high": {"cpus": 12, "memory_gb": 72, "time_h": 16},
+    "process_high_memory": {"cpus": 12, "memory_gb": 200, "time_h": 16}
+  },
+  "versions_use_topic_channels": true,
+  "docker_registry": "quay.io/biocontainers/",
+  "singularity_registry": "https://depot.galaxyproject.org/singularity/",
+  "conda_channels": ["conda-forge", "bioconda", "defaults"],
+  "meta_yml_required_fields": ["name", "description", "tools", "input", "output"],
+  "edam_for": {
+    "fastq":   "http://edamontology.org/format_1930",
+    "fasta":   "http://edamontology.org/format_1929",
+    "bam":     "http://edamontology.org/format_2572",
+    "cram":    "http://edamontology.org/format_3462",
+    "vcf":     "http://edamontology.org/format_3016",
+    "bcf":     "http://edamontology.org/format_3016",
+    "bed":     "http://edamontology.org/format_3003",
+    "gtf":     "http://edamontology.org/format_2306",
+    "gff":     "http://edamontology.org/format_1975",
+    "tsv":     "http://edamontology.org/format_3475",
+    "csv":     "http://edamontology.org/format_3752",
+    "json":    "http://edamontology.org/format_3464",
+    "yaml":    "http://edamontology.org/format_3750",
+    "pdf":     "http://edamontology.org/format_3508",
+    "html":    "http://edamontology.org/format_2331",
+    "tar":     "http://edamontology.org/format_3975",
+    "zip":     "http://edamontology.org/format_3989"
+  },
+  "ext_args_pattern": "def args = task.ext.args ?: ''",
+  "ext_prefix_pattern": "def prefix = task.ext.prefix ?: \"${meta.id}\"",
+  "known_tools": [
+    "samtools", "bwa", "bcftools", "fastqc", "trimmomatic",
+    "hisat2", "star", "bowtie2", "gatk", "picard",
+    "minimap2", "bedtools", "deeptools", "multiqc", "fastp",
+    "bwa-mem2", "snakemake", "nextflow", "seqkit", "nanostat"
+  ],
+  "tier_thresholds": {
+    "tier1_max": 1,
+    "tier2_max": 2,
+    "tier3_max": 3,
+    "tier4_max": 4,
+    "pre_select_min_confidence": 0.70
+  },
+  "helper_filename_patterns": ["utils", "helpers", "common", "config", "setup"],
+  "helper_dirname_patterns": ["tests", "test", "docs", "examples", ".github"],
+  "test_data_base_path": "https://raw.githubusercontent.com/nf-core/test-datasets/",
+  "test_data_index": [
+    {
+      "id": "sarscov2_fastq_paired",
+      "paths": [
+        "genomics/sarscov2/illumina/fastq/test_1.fastq.gz",
+        "genomics/sarscov2/illumina/fastq/test_2.fastq.gz"
+      ],
+      "tags": ["fastq", "paired_end", "illumina", "short_read"],
+      "organism": "sarscov2",
+      "size_kb": 90
+    },
+    {
+      "id": "sarscov2_fastq_single",
+      "paths": ["genomics/sarscov2/illumina/fastq/test.fastq.gz"],
+      "tags": ["fastq", "single_end", "illumina"],
+      "organism": "sarscov2",
+      "size_kb": 45
+    },
+    {
+      "id": "sarscov2_bam",
+      "paths": [
+        "genomics/sarscov2/illumina/bam/test.paired_end.bam",
+        "genomics/sarscov2/illumina/bam/test.paired_end.bam.bai"
+      ],
+      "tags": ["bam", "bai", "sorted", "illumina"],
+      "organism": "sarscov2",
+      "size_kb": 120
+    },
+    {
+      "id": "sarscov2_fasta",
+      "paths": [
+        "genomics/sarscov2/genome/genome.fasta",
+        "genomics/sarscov2/genome/genome.fasta.fai"
+      ],
+      "tags": ["fasta", "fasta_index", "genome"],
+      "organism": "sarscov2",
+      "size_kb": 35
+    },
+    {
+      "id": "sarscov2_vcf",
+      "paths": [
+        "genomics/sarscov2/illumina/vcf/test.vcf.gz",
+        "genomics/sarscov2/illumina/vcf/test.vcf.gz.tbi"
+      ],
+      "tags": ["vcf", "vcf_gz", "tbi"],
+      "organism": "sarscov2",
+      "size_kb": 15
+    },
+    {
+      "id": "sarscov2_bed",
+      "paths": ["genomics/sarscov2/genome/bed8/test.bed"],
+      "tags": ["bed"],
+      "organism": "sarscov2",
+      "size_kb": 2
+    },
+    {
+      "id": "sarscov2_gtf",
+      "paths": ["genomics/sarscov2/genome/genome.gtf"],
+      "tags": ["gtf", "annotation"],
+      "organism": "sarscov2",
+      "size_kb": 8
+    }
+  ],
+  "derivation_templates": {
+    "derive_vcf": {
+      "template": "derive_vcf.sh.j2",
+      "tool_requirements": ["bcftools"],
+      "applicable_tags": ["vcf", "vcf_gz", "bcf"],
+      "source_id": "sarscov2_vcf",
+      "output_pattern": "{sample_id}.vcf.gz"
+    },
+    "derive_fasta": {
+      "template": "derive_fasta.sh.j2",
+      "tool_requirements": ["samtools"],
+      "applicable_tags": ["fasta", "fasta_gz"],
+      "source_id": "sarscov2_fasta",
+      "output_pattern": "{sample_id}.fasta"
+    },
+    "derive_bam": {
+      "template": "derive_bam.sh.j2",
+      "tool_requirements": ["samtools"],
+      "applicable_tags": ["bam", "cram", "sam", "sorted_bam"],
+      "source_id": "sarscov2_bam",
+      "output_pattern": "{sample_id}_sorted.bam"
+    },
+    "derive_bed": {
+      "template": "derive_bed.sh.j2",
+      "tool_requirements": [],
+      "applicable_tags": ["bed"],
+      "source_id": "sarscov2_bed",
+      "output_pattern": "{sample_id}.bed"
+    }
+  },
+  "chain_modules": {
+    "bwa_index": {
+      "module": "modules/nf-core/bwa/index/main.nf",
+      "process_name": "BWA_INDEX",
+      "test_input_path": "genomics/sarscov2/genome/genome.fasta",
+      "output_channel": "index",
+      "produces_tags": ["bwa_index", "genome_index"],
+      "fast": true
+    },
+    "samtools_faidx": {
+      "module": "modules/nf-core/samtools/faidx/main.nf",
+      "process_name": "SAMTOOLS_FAIDX",
+      "test_input_path": "genomics/sarscov2/genome/genome.fasta",
+      "output_channel": "fai",
+      "produces_tags": ["fasta_index", "fai"],
+      "fast": true
+    },
+    "samtools_sort": {
+      "module": "modules/nf-core/samtools/sort/main.nf",
+      "process_name": "SAMTOOLS_SORT",
+      "test_input_path": "genomics/sarscov2/illumina/bam/test.bam",
+      "output_channel": "bam",
+      "produces_tags": ["bam", "sorted_bam"],
+      "fast": false
+    }
+  }
+}

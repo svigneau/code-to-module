@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "process_labels": [],
+  "required_output_channels": [],
+  "container_registries": {
+    "docker": "",
+    "singularity": ""
+  },
+  "required_meta_yml_fields": [],
+  "edam_ontology_terms": {},
+  "test_data_index": [],
+  "derivation_templates": {},
+  "chain_modules": {},
+  "generation_tool_commands": {}
+}

@@ -1,0 +1,29 @@
+name: mytool/run
+description: Run mytool on input reads
+keywords:
+  - mytool
+tools:
+  - mytool:
+      description: A bioinformatics tool
+      homepage: https://mytool.example.com
+      documentation: https://mytool.example.com/docs
+      licence: ['MIT']
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing sample information
+  - reads:
+      type: file
+      description: Input reads file
+      pattern: "*.fastq.gz"
+output:
+  - meta:
+      type: map
+  - output:
+      type: file
+      description: Output text file
+      pattern: "*.txt"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"

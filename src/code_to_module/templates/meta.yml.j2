@@ -1,0 +1,87 @@
+{% set edam_map = {
+    'fastq': 'http://edamontology.org/format_1930',
+    'bam': 'http://edamontology.org/format_2572',
+    'bed': 'http://edamontology.org/format_3003',
+    'tsv': 'http://edamontology.org/format_3475',
+    'vcf': 'http://edamontology.org/format_3016',
+    'fasta': 'http://edamontology.org/format_1929',
+    'sam': 'http://edamontology.org/format_2573',
+    'gtf': 'http://edamontology.org/format_2306',
+} %}
+name: {{ spec.tool_name }}/{{ spec.functionality_name }}
+description: TODO - add description for {{ spec.tool_name }} {{ spec.functionality_name }}.
+keywords:
+  - {{ spec.tool_name }}
+  - {{ spec.functionality_name }}
+tools:
+  - {{ spec.tool_name }}:
+      description: TODO - add tool description.
+      homepage: TODO
+      documentation: TODO
+      tool_dev_url: TODO
+      licence: ["TODO"]
+      identifier: ""
+
+input:
+{% for ch in spec.inputs %}
+  - - {% if ch.type == 'map' %}meta:
+        type: map
+        description: |
+          Groovy Map containing sample information.
+          e.g. `[ id:'test', single_end:false ]`
+    - {{ ch.name }}:
+{% else %}{{ ch.name }}:
+{% endif %}
+        type: {{ ch.type }}
+        description: {{ ch.description }}
+{% if ch.pattern %}
+        pattern: "{{ ch.pattern }}"
+{% endif %}
+{% set edam_uris = [] %}
+{% for tag in ch.format_tags %}{% if tag in edam_map %}{% set _ = edam_uris.append(edam_map[tag]) %}{% endif %}{% endfor %}
+{% if edam_uris %}
+        ontologies:
+{% for uri in edam_uris %}
+          - edam: "{{ uri }}"
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+output:
+{% for ch in spec.outputs %}
+  - {{ ch.name }}:
+{% if ch.type == 'map' %}
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information.
+            e.g. `[ id:'test', single_end:false ]`
+      - "{{ ch.pattern or ('*.' + ch.name) }}":
+{% else %}
+      - "{{ ch.pattern or ('*.' + ch.name) }}":
+{% endif %}
+          type: file
+          description: {{ ch.description }}
+{% if ch.pattern %}
+          pattern: "{{ ch.pattern }}"
+{% endif %}
+{% set edam_uris = [] %}
+{% for tag in ch.format_tags %}{% if tag in edam_map %}{% set _ = edam_uris.append(edam_map[tag]) %}{% endif %}{% endfor %}
+{% if edam_uris %}
+          ontologies:
+{% for uri in edam_uris %}
+            - edam: "{{ uri }}"
+{% endfor %}
+{% endif %}
+{% endfor %}
+  - versions:
+      - versions:
+          type: tuple
+          description: Channel containing process name and tool version.
+          pattern: ""
+
+authors:
+  - "@TODO"
+
+maintainers:
+  - "@TODO"

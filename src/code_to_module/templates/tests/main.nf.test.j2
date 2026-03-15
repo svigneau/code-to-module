@@ -1,0 +1,89 @@
+nextflow_process {
+    name "Test Process {{ spec.process_name }}"
+    script "../main.nf"
+    process "{{ spec.process_name }}"
+    config "./nextflow.config"
+    tag "{{ spec.tool_name }}"
+    tag "{{ spec.functionality_name }}"
+{% for test_case in test_spec.test_cases %}
+
+    test("{{ test_case.name }}") {
+        tag "{{ spec.label }}"
+{% if test_case.is_stub_test %}
+        options "-stub"
+{% endif %}
+{% if test_case.setup_module %}
+        setup {
+            run("{{ test_case.setup_module_process_name }}") {
+                script "{{ test_case.setup_module }}"
+                process {
+                    """
+                    input[0] = [
+                        [ id:'test', single_end:false ],
+                        file(params.modules_testdata_base_path + '{{ test_case.setup_module_input }}',
+                             checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = {{ test_case.setup_module_process_name }}.out.{{ test_case.setup_module_output }}
+                """
+            }
+        }
+{% else %}
+        when {
+            process {
+                """
+{% for idx in range(test_case.input_files | length) %}
+{% set file = test_case.input_files[idx] %}
+{% set source_type = test_case.input_sources[idx].value if idx < (test_case.input_sources | length) else 'nfcore_datasets' %}
+{% if source_type == 'stub' %}
+                // TODO: Replace this stub with real test data.
+                // This module uses Nextflow stub mode — check main.nf stub: block.
+                // To add proper test data, see: https://nf-co.re/docs/tutorials/tests_and_test_data/test_data
+                // Options in priority order:
+                //   1. Reuse an existing file from nf-core/test-datasets modules branch
+                //   2. Derive from an existing nf-core file using a transformation script
+                //   3. Chain an upstream nf-core module in a setup {} block
+                //   4. Use stub: mode if data is too large or requires a local database
+                input[{{ idx }}] = [
+                    [ id:'test', single_end:false ],
+                    file("stub_placeholder", checkIfExists: false)
+                ]
+{% elif source_type == 'derived' %}
+                input[{{ idx }}] = [
+                    [ id:'test', single_end:false ],
+                    file("${projectDir}/tests/data/{{ file }}", checkIfExists: true)
+                ]
+{% else %}
+                input[{{ idx }}] = [
+                    [ id:'test', single_end:false ],
+                    file(params.modules_testdata_base_path + '{{ file }}',
+                         checkIfExists: true)
+                ]
+{% endif %}
+{% endfor %}
+                """
+            }
+        }
+{% endif %}
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(
+{% for out in test_case.expected_outputs %}
+                    process.out.{{ out }},
+{% endfor %}
+                    process.out.versions
+                ).match() }
+            )
+        }
+    }
+{% endfor %}
+}

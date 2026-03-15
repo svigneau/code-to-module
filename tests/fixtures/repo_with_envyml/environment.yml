@@ -1,0 +1,10 @@
+name: mytool
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.10
+  - samtools=1.17
+  - pip:
+    - requests>=2.28
+    - httpx>=0.24

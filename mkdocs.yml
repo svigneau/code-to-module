@@ -1,0 +1,53 @@
+site_name: code-to-module
+site_description: LLM-assisted nf-core module generation from scripts and repos
+repo_url: https://github.com/your-org/code-to-module
+repo_name: code-to-module
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - content.code.annotate
+
+nav:
+  - Home: index.md
+  - User Guide: user-guide.md
+  - CLI Reference: cli-reference.md
+  - Known Limitations: known-limitations.md
+  - Contributing: contributing.md
+  - Development Tutorial: development-tutorial.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - mkdocs-click

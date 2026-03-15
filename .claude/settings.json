@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install*)",
+      "Bash(pip install --break-system-packages*)",
+      "Bash(pytest*)",
+      "Bash(python*)",
+      "Bash(nf-core*)",
+      "Bash(git clone*)",
+      "Bash(git*)",
+      "Bash(docker build*)",
+      "Bash(curl https://api.anaconda.org*)",
+      "Bash(curl https://bio.tools*)",
+      "Bash(curl https://quay.io*)",
+      "Bash(curl https://ghcr.io*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo*)",
+      "Bash(docker push*)"
+    ]
+  }
+}

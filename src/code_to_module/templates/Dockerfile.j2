@@ -1,0 +1,15 @@
+{% if source == 'envyml' %}
+FROM condaforge/mambaforge:latest
+LABEL maintainer="code-to-module <https://github.com/your-org/code-to-module>"
+COPY environment.yml /tmp/environment.yml
+RUN mamba env create -f /tmp/environment.yml && \
+    mamba clean --all --yes && \
+    conda clean --all --yes
+ENV PATH /opt/conda/envs/{{ env_name }}/bin:$PATH
+{% elif source == 'reqs' %}
+FROM python:{{ python_version }}-slim
+LABEL maintainer="code-to-module <https://github.com/your-org/code-to-module>"
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+{% endif %}

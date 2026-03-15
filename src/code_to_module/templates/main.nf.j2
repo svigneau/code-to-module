@@ -1,0 +1,74 @@
+process {{ spec.process_name }} {
+    tag "$meta.id"
+    label '{{ spec.label }}'
+
+    conda "${moduleDir}/environment.yml"
+{% if spec.container_source.value in ('dockerfile', 'generated_from_envyml', 'generated_from_reqs', 'converted_from_singularity') %}
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'docker://{{ spec.container_docker }}' :
+        '{{ spec.container_docker }}' }"
+    // Container built from repo — see Dockerfile in module directory
+{% elif spec.container_source.value == 'biocontainers' %}
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        '{{ spec.container_singularity }}' :
+        '{{ spec.container_docker }}' }"
+{% else %}
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'TODO: add Singularity container URL' :
+        'TODO: add Docker container URL' }"
+{% endif %}
+
+    input:
+{% for ch in spec.inputs %}
+{% if ch.type == 'map' %}
+    tuple val(meta), path({{ ch.name }}{% if ch.optional %}, optional: true{% endif %})
+{% elif ch.type == 'file' %}
+    path({{ ch.name }}{% if ch.optional %}, optional: true{% endif %})
+{% else %}
+    val({{ ch.name }})
+{% endif %}
+{% endfor %}
+
+    output:
+{% for ch in spec.outputs %}
+{% if ch.name == "versions" %}
+{% elif ch.type == 'map' %}
+    tuple val(meta), path("{{ ch.pattern or ('*.' + ch.name) }}"), emit: {{ ch.name }}
+{% elif ch.type == 'file' %}
+    path("{{ ch.pattern or ('*.' + ch.name) }}"), emit: {{ ch.name }}
+{% else %}
+    val({{ ch.name }}), emit: {{ ch.name }}
+{% endif %}
+{% endfor %}
+    tuple val(task.process), env(TOOL_VERSION), emit: versions, topic: 'versions'
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+{% if spec.script_template %}
+    {{ spec.script_template | format_script_command }}
+{% else %}
+    // TODO: add actual {{ spec.tool_name }} command here
+{% endif %}
+    TOOL_VERSION=\$({{ spec.tool_name }} --version 2>&1 | head -1)
+    """
+
+    stub:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+{% for ch in spec.outputs %}
+{% if ch.name != "versions" %}
+{% for fname in ch | stub_filenames %}
+    touch {{ fname }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+    TOOL_VERSION="stub"
+    """
+}

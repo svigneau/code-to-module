@@ -1,0 +1,24 @@
+nextflow_process {
+    name "Test SAMTOOLS_SORT"
+    script "../main.nf"
+    process "SAMTOOLS_SORT"
+
+    test("sarscov2 - bam") {
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', single_end:false ],
+                    file(params.modules_testdata_base_path + 'genomics/sarscov2/illumina/bam/test.paired_end.sorted.bam', checkIfExists: true)
+                ]
+                """
+            }
+        }
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out.bam).match("bam") }
+            )
+        }
+    }
+}

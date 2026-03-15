@@ -1,0 +1,9 @@
+name: nf-core-mytool-1.0
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # STYLE ISSUE: unpinned version
+  - mytool
+  - python=3.11

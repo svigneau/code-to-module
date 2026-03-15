@@ -1,0 +1,14 @@
+{
+    "bam": {
+        "content": [
+            [
+                {
+                    "id": "test",
+                    "single_end": false
+                },
+                "test.bam:md5,OLD_CHECKSUM_THAT_WILL_MISMATCH"
+            ]
+        ],
+        "timestamp": "2024-01-01T00:00:00.000000"
+    }
+}

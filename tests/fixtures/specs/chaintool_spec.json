@@ -1,0 +1,40 @@
+{
+  "tool_name": "chaintool",
+  "process_name": "CHAINTOOL_RUN",
+  "functionality_name": "run",
+  "inputs": [
+    {
+      "name": "reads",
+      "type": "map",
+      "description": "Input FASTQ reads paired with sample metadata",
+      "pattern": "*.fastq.gz",
+      "optional": false,
+      "format_tags": [],
+      "test_data_strategy": "standard_format"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "report",
+      "type": "file",
+      "description": "Output report file produced by chaintool run",
+      "pattern": "*.txt",
+      "optional": false,
+      "format_tags": [],
+      "test_data_strategy": "unknown"
+    }
+  ],
+  "container_docker": "quay.io/biocontainers/chaintool:1.0.0--py_0",
+  "container_singularity": "https://depot.galaxyproject.org/singularity/chaintool:1.0.0--py_0",
+  "container_source": "biocontainers",
+  "dockerfile_content": null,
+  "conda_package": "chaintool=1.0.0",
+  "environment_yml_content": null,
+  "label": "process_single",
+  "ext_args": "def args = task.ext.args ?: ''",
+  "script_template": "chaintool run $args $reads > ${prefix}.txt",
+  "tier": 1,
+  "confidence": 0.9,
+  "warnings": [],
+  "infer_failed": false
+}
