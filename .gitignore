@@ -34,7 +34,7 @@ site/
 
 # Project-specific
 debug_log.txt
-modules/
+/modules/
 
 # Devcontainer local overrides
 .devcontainer/*.local.json

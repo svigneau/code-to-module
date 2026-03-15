@@ -18,6 +18,45 @@ _FIXTURES = Path(__file__).parent / "fixtures" / "modules"
 _PASSING = _FIXTURES / "passing"
 _NEEDS_REVIEW = _FIXTURES / "needs_review"
 
+# ── Constants for versions-check tests ─────────────────────────────────────────
+
+OLD_ENV_PATTERN_MAIN_NF = (
+    "process OLDTOOL {\n"
+    "    label 'process_medium'\n"
+    "    input:\n"
+    "    tuple val(meta), path(bam)\n"
+    "    output:\n"
+    "    tuple val(task.process), env(TOOL_VERSION), emit: versions, topic: 'versions'\n"
+    "    when:\n"
+    "    task.ext.when == null || task.ext.when\n"
+    "    script:\n"
+    "    def args = task.ext.args ?: ''\n"
+    '    """\n'
+    "    oldtool $args $bam\n"
+    "    TOOL_VERSION=$(oldtool --version 2>&1 | head -1)\n"
+    '    """\n'
+    "}\n"
+)
+
+MINIMAL_META_YML = (
+    "name: oldtool/run\n"
+    "description: Run oldtool\n"
+    "keywords: [a, b, c]\n"
+    "tools: []\n"
+    "input: []\n"
+    "output: []\n"
+)
+
+MINIMAL_ENV_YML = (
+    "name: nf-core-oldtool-1.0\n"
+    "channels:\n"
+    "  - conda-forge\n"
+    "  - bioconda\n"
+    "  - defaults\n"
+    "dependencies:\n"
+    "  - oldtool=1.0\n"
+)
+
 
 # ── Test 1: passing module is submission ready ─────────────────────────────────
 
@@ -404,3 +443,34 @@ def test_json_output(tmp_path: Path) -> None:
     # Validate it round-trips through the model
     report = ReviewReport.model_validate(data)
     assert isinstance(report.submission_ready, bool)
+
+
+# ── Test 11: eval() pattern passes versions check ─────────────────────────────
+
+
+def test_versions_check_detects_eval_pattern() -> None:
+    """review_module passes versions check when eval() pattern is present."""
+    standards = Standards()
+    report = review_module(_PASSING, standards)
+    versions_errors = [
+        i for i in report.items
+        if i.category == "versions" and i.severity == "ERROR"
+    ]
+    assert len(versions_errors) == 0
+
+
+# ── Test 12: env(TOOL_VERSION) pattern triggers warning ───────────────────────
+
+
+def test_versions_check_warns_on_old_env_pattern(tmp_path: Path) -> None:
+    """review_module flags env(TOOL_VERSION) pattern as a warning."""
+    (tmp_path / "main.nf").write_text(OLD_ENV_PATTERN_MAIN_NF)
+    (tmp_path / "meta.yml").write_text(MINIMAL_META_YML)
+    (tmp_path / "environment.yml").write_text(MINIMAL_ENV_YML)
+    standards = Standards()
+    report = review_module(tmp_path, standards)
+    versions_warnings = [
+        i for i in report.items
+        if i.category == "versions" and "env(TOOL_VERSION)" in i.message
+    ]
+    assert len(versions_warnings) >= 1

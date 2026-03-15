@@ -251,6 +251,7 @@ def _json_to_module_spec(data: dict[str, Any], func: FunctionalitySpec, tier: in
         label=str(data.get("label", get_standards().valid_labels[0])),
         ext_args=str(data.get("ext_args", "def args = task.ext.args ?: ''")),
         script_template=str(data.get("script_template", "")),
+        version_command=str(data.get("version_command", "")),
         tier=tier,
         confidence=float(data.get("confidence", 0.5)),
         warnings=list(data.get("warnings", [])),

@@ -313,7 +313,11 @@ def _check_meta_yml(
                     ))
 
     # Channel cross-reference: meta.yml ↔ main.nf emit names
-    main_nf_emits = set(_output_emit_names(main_nf)) - {"versions", "meta"}
+    # Exclude versions topic channels (named 'versions' or 'versions_*')
+    main_nf_emits = {
+        e for e in _output_emit_names(main_nf)
+        if e != "meta" and not e.startswith("versions")
+    }
     _, meta_out_names = _meta_yml_channel_names(data)
     meta_out_set = set(meta_out_names)
 
@@ -371,46 +375,30 @@ def _check_meta_yml(
 
 def _check_versions(main_nf: str) -> list[ReviewItem]:
     items: list[ReviewItem] = []
-    script = _script_block(main_nf)
-    stub = _stub_block(main_nf)
-    combined = script + stub
 
-    if not combined:
-        return items
+    has_eval = "eval(" in main_nf
+    has_env_version = bool(re.search(r"env\s*\(\s*TOOL_VERSION\s*\)", main_nf))
+    has_versions_yml = "versions.yml" in main_nf
 
-    if "versions.yml" not in combined:
+    if has_eval:
+        pass  # Current nf-core standard — no issue
+    elif has_env_version:
+        items.append(ReviewItem(
+            severity="WARNING",
+            category="versions",
+            message=(
+                "Version capture uses deprecated env(TOOL_VERSION) pattern — "
+                "use eval() output qualifier instead (see fastqc module for reference)"
+            ),
+        ))
+    elif has_versions_yml:
+        pass  # Older heredoc pattern — acceptable, no error
+    else:
         items.append(ReviewItem(
             severity="ERROR",
             category="versions",
-            message="Module must capture software version in versions.yml",
+            message="Module must capture software version — add eval() to the versions output channel",
         ))
-        return items
-
-    # Fragile version capture: --version without 2>&1 or || true
-    version_lines = [
-        ln for ln in combined.splitlines()
-        if "--version" in ln or "version" in ln.lower()
-    ]
-    for ln in version_lines:
-        stripped = ln.strip()
-        if "--version" in stripped and "2>&1" not in stripped and "|| true" not in stripped:
-            items.append(ReviewItem(
-                severity="WARNING",
-                category="versions",
-                message="Version capture may fail if tool exits non-zero — add '|| true'",
-            ))
-            break
-
-    # Non-standard format: check if versions.yml is written via cat <<-END_VERSIONS (standard)
-    # or some other approach
-    if "versions.yml" in combined and "END_VERSIONS" not in combined:
-        # Also acceptable: echo ... >> versions.yml
-        if ">>" not in combined and ">" not in combined:
-            items.append(ReviewItem(
-                severity="INFO",
-                category="versions",
-                message="Non-standard version capture pattern — check nf-core module template",
-            ))
 
     return items
 

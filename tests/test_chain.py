@@ -131,6 +131,6 @@ def test_chain_main_nf_invariants(tmp_path: Path) -> None:
 
     assert "CHAINTOOL_RUN" in main_nf, "Process name missing"
     assert "task.ext.args" in main_nf, "task.ext.args pattern missing"
-    assert "topic: 'versions'" in main_nf, "versions topic channel missing"
+    assert "topic: versions" in main_nf, "versions topic channel missing"
     assert "emit: versions" in main_nf, "versions emit missing"
     assert "quay.io/biocontainers/chaintool" in main_nf, "Docker container URL missing"

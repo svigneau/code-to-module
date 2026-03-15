@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import tempfile
 from pathlib import Path
 
 from rich.console import Console
@@ -19,6 +20,34 @@ from code_to_module.models import (
 )
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
+
+def make_test_spec(tool_name: str = "testtool", version_command: str = "") -> ModuleSpec:
+    return ModuleSpec(
+        tool_name=tool_name,
+        process_name=tool_name.upper() + "_RUN",
+        functionality_name="run",
+        inputs=[ChannelSpec(name="bam", type="map", description="Input BAM file")],
+        outputs=[ChannelSpec(name="sorted_bam", type="map", description="Sorted BAM")],
+        container_docker=f"quay.io/biocontainers/{tool_name}:1.0.0--pyhdfd78af_0",
+        container_singularity=f"https://depot.galaxyproject.org/singularity/{tool_name}:1.0.0--pyhdfd78af_0",
+        container_source=ContainerSource.BIOCONTAINERS,
+        dockerfile_content=None,
+        label="process_medium",
+        ext_args="",
+        tier=1,
+        confidence=0.90,
+        version_command=version_command,
+    )
+
+
+def render_module(spec: ModuleSpec) -> str:
+    """Generate module files and return the main.nf content."""
+    console, _ = _capture_console()
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+        generate(spec, _minimal_test_spec(), tmp_path, console=console)
+        return (tmp_path / spec.tool_name / "main.nf").read_text()
 
 
 def _minimal_spec(
@@ -155,7 +184,7 @@ def test_no_duplicate_versions_emit(tmp_path: Path) -> None:
     content = (tmp_path / "mytool" / "main.nf").read_text()
     # Only the topic-channel form should appear; the bare val(versions) must not
     assert content.count("emit: versions") == 1
-    assert "topic: 'versions'" in content
+    assert "topic: versions" in content
     assert "val(versions), emit: versions" not in content
 
 
@@ -368,6 +397,30 @@ def test_consistency_check_skipped_when_empty(tmp_path: Path) -> None:
              existing_modules=[], console=console)
 
     assert "Consistency warning" not in buf.getvalue()
+
+
+def test_generated_main_nf_uses_eval_versions(tmp_path: Path) -> None:
+    """Generated main.nf uses eval() for version capture, not env(TOOL_VERSION)."""
+    spec = make_test_spec(tool_name="testtool", version_command="testtool --version")
+    result = render_module(spec)
+    assert 'eval("testtool --version' in result
+    assert 'env(TOOL_VERSION)' not in result
+    assert 'TOOL_VERSION=' not in result
+
+
+def test_generated_stub_has_no_tool_version_assignment(tmp_path: Path) -> None:
+    """Stub block does not contain TOOL_VERSION= after eval migration."""
+    spec = make_test_spec(tool_name="testtool", version_command="testtool --version")
+    result = render_module(spec)
+    stub_section = result.split('stub:')[1] if 'stub:' in result else ''
+    assert 'TOOL_VERSION=' not in stub_section
+
+
+def test_eval_emit_name_uses_tool_name(tmp_path: Path) -> None:
+    """versions emit name is versions_{tool_name}, not generic 'versions'."""
+    spec = make_test_spec(tool_name="celltypist", version_command="celltypist --version 2>&1 | head -1")
+    result = render_module(spec)
+    assert 'emit: versions_celltypist' in result
 
 
 def test_consistency_check_load_error_skipped(tmp_path: Path) -> None:

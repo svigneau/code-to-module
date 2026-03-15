@@ -13,7 +13,7 @@ process SAMTOOLS_SORT {
     output:
     tuple val(meta), path("*.bam"),  emit: bam
     tuple val(meta), path("*.bai"),  emit: bai, optional: true
-    path "versions.yml",             emit: versions, topic: 'versions'
+    tuple val("${task.process}"), val('samtools'), eval("samtools --version 2>&1 | head -1"), topic: versions, emit: versions_samtools
 
     when:
     task.ext.when == null || task.ext.when
@@ -27,11 +27,6 @@ process SAMTOOLS_SORT {
         -@ $task.cpus \\
         -o ${prefix}.bam \\
         $bam
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -39,6 +34,5 @@ process SAMTOOLS_SORT {
     """
     touch ${prefix}.bam
     touch ${prefix}.bam.bai
-    touch versions.yml
     """
 }

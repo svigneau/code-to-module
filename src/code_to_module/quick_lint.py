@@ -148,7 +148,9 @@ def quick_lint(module_dir: Path, standards: Standards) -> list[QuickLintWarning]
             ))
 
         # ── missing_versions_topic ───────────────────────────────────────────
-        if standards.versions_use_topic_channels and "topic: 'versions'" not in main_content:
+        if standards.versions_use_topic_channels and (
+            "topic: versions" not in main_content and "topic: 'versions'" not in main_content
+        ):
             issues.append(QuickLintWarning(
                 severity="error",
                 check="missing_versions_topic",

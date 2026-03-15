@@ -40,7 +40,8 @@ process {{ spec.process_name }} {
     val({{ ch.name }}), emit: {{ ch.name }}
 {% endif %}
 {% endfor %}
-    tuple val(task.process), env(TOOL_VERSION), emit: versions, topic: 'versions'
+{% set vcmd = spec.version_command if spec.version_command else spec.tool_name + " --version 2>&1 | head -1" %}
+    tuple val("${task.process}"), val('{{ spec.tool_name }}'), eval("{{ vcmd }}"), topic: versions, emit: versions_{{ spec.tool_name }}
 
     when:
     task.ext.when == null || task.ext.when
@@ -54,7 +55,6 @@ process {{ spec.process_name }} {
 {% else %}
     // TODO: add actual {{ spec.tool_name }} command here
 {% endif %}
-    TOOL_VERSION=\$({{ spec.tool_name }} --version 2>&1 | head -1)
     """
 
     stub:
@@ -68,7 +68,5 @@ process {{ spec.process_name }} {
 {% endfor %}
 {% endif %}
 {% endfor %}
-
-    TOOL_VERSION="stub"
     """
 }

@@ -155,6 +155,7 @@ class ModuleSpec(BaseModel):
     label: str
     ext_args: str
     script_template: str = ""
+    version_command: str = ""  # plain shell command, fed into eval(); defaults to tool_name --version
     tier: int
     confidence: float
     warnings: list[str] = []
