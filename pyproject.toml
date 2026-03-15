@@ -45,7 +45,7 @@ ctm-validate = "code_to_module.validate_cli:main"
 # be extracted into a standalone nf-module-tools package later.
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-asyncio", "pytest-mock", "ruff", "mypy"]
+dev = ["pytest", "pytest-asyncio", "pytest-mock", "ruff", "mypy", "types-PyYAML"]
 docs = [
     "mkdocs>=1.6",
     "mkdocs-material>=9.5",

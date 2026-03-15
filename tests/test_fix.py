@@ -10,18 +10,13 @@ import shutil
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from code_to_module.fix import (
     FixSource,
     ProposedFix,
-    _apply_unified_diff,
     _rule_missing_topic,
     _rule_stale_snapshot,
     _rule_wrong_container_prefix,
-    apply_approved_fixes,
     apply_fix,
-    propose_fixes,
 )
 from code_to_module.standards.loader import Standards
 from code_to_module.validate import FixClass, LintFailure, NfTestFailure, TestReport

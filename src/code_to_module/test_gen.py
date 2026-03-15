@@ -143,8 +143,9 @@ def generate_test_spec(
                 [TestDataSource.NFCORE_DATASETS] * len(m.resolved_paths)
             )
         else:
-            plan = r.deriv_plan
-            assert plan is not None
+            deriv = r.deriv_plan
+            assert deriv is not None
+            plan = deriv
             if plan.strategy == "chain":
                 setup_module = plan.setup_module
                 setup_process_name = plan.setup_process_name

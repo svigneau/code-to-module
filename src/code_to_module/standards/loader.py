@@ -6,7 +6,7 @@ import json
 from datetime import date
 from importlib.resources import files
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import httpx
 
@@ -30,7 +30,7 @@ def _load_bundled() -> dict[str, Any]:
     schema_bytes = (
         files("code_to_module.standards") / "data" / "nf_core_standards.json"
     ).read_bytes()
-    return json.loads(schema_bytes)
+    return cast(dict[str, Any], json.loads(schema_bytes))
 
 
 def _validate_schema(data: dict[str, Any]) -> None:
@@ -57,11 +57,11 @@ class Standards:
 
     @property
     def schema_version(self) -> str:
-        return self._data["schema_version"]
+        return cast(str, self._data["schema_version"])
 
     @property
     def last_updated(self) -> str:
-        return self._data.get("last_updated", "")
+        return cast(str, self._data.get("last_updated", ""))
 
     @property
     def valid_labels(self) -> list[str]:
@@ -77,11 +77,11 @@ class Standards:
 
     @property
     def docker_registry(self) -> str:
-        return self._data["docker_registry"]
+        return cast(str, self._data["docker_registry"])
 
     @property
     def singularity_registry(self) -> str:
-        return self._data["singularity_registry"]
+        return cast(str, self._data["singularity_registry"])
 
     @property
     def conda_channels(self) -> list[str]:
@@ -98,11 +98,11 @@ class Standards:
 
     @property
     def ext_args_pattern(self) -> str:
-        return self._data["ext_args_pattern"]
+        return cast(str, self._data["ext_args_pattern"])
 
     @property
     def ext_prefix_pattern(self) -> str:
-        return self._data["ext_prefix_pattern"]
+        return cast(str, self._data["ext_prefix_pattern"])
 
     @property
     def known_tools(self) -> list[str]:
@@ -122,7 +122,7 @@ class Standards:
 
     @property
     def test_data_base_path(self) -> str:
-        return self._data["test_data_base_path"]
+        return cast(str, self._data["test_data_base_path"])
 
     @property
     def test_data_index(self) -> list[dict[str, Any]]:
@@ -169,7 +169,7 @@ class Standards:
             resp = httpx.get(url, timeout=5.0, follow_redirects=True)
             if resp.status_code != 200:
                 return None
-            remote_version = resp.json().get("schema_version", "")
+            remote_version = cast(str, resp.json().get("schema_version", ""))
             if remote_version and remote_version != self.schema_version:
                 return remote_version
         except Exception:

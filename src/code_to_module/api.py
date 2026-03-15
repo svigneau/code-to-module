@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import io
 from pathlib import Path
+from typing import Any
 
 from rich.console import Console
 
@@ -45,7 +46,7 @@ def convert(
     docs: list[str] | None = None,
     existing_modules: list[str] | None = None,
     _inject_spec: ModuleSpec | None = None,
-) -> dict:
+) -> dict[str, Any]:
     """Convert *source* into nf-core module(s) and return structured results.
 
     Parameters
@@ -134,7 +135,7 @@ def convert(
                 "error": None,
             }
 
-        modules: list[dict] = []
+        modules: list[dict[str, Any]] = []
 
         for func in disc_result.selected:
             # 4. Assess
@@ -248,7 +249,7 @@ def get_functionalities(
     source: str,
     docs: list[str] | None = None,
     existing_modules: list[str] | None = None,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Return all detected functionalities with their metadata.
 
     Useful for any caller that wants to present or filter the selection
@@ -277,7 +278,7 @@ def get_container_options(
     functionality: str | None = None,
     docs: list[str] | None = None,
     existing_modules: list[str] | None = None,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Return all available container options for the named functionality.
 
     If *functionality* is None, uses the first detected functionality.

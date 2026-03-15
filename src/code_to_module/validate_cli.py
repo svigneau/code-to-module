@@ -117,10 +117,10 @@ def _print_class_c_panels(report: TestReport, console: Console) -> None:
     class_c_lint = [f for f in report.lint_failures if f.fix_class == FixClass.CLASS_C]
     class_c_nft = [f for f in report.nftest_failures if f.fix_class == FixClass.CLASS_C]
 
-    for failure in class_c_lint + class_c_nft:  # type: ignore[operator]
+    for failure in class_c_lint + class_c_nft:
         if hasattr(failure, "code"):
             title = f"CLASS C: {failure.code}"
-            body = f"{failure.message}\n\nThis cannot be fixed automatically.\n{failure.fix_hint}"
+            body = f"{failure.message}\n\nThis cannot be fixed automatically.\n{failure.fix_hint}"  # type: ignore[union-attr]
         else:
             title = f"CLASS C: {failure.test_name}"
             body = f"{failure.error[:300]}\n\nThis cannot be fixed automatically.\n{failure.fix_hint}"

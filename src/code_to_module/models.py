@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -271,7 +271,7 @@ class TestCase(BaseModel):
     setup_module_process_name: str | None = None
     setup_module_input: str | None = None
     setup_module_output: str | None = None
-    params: dict = {}
+    params: dict[str, Any] = {}
     expected_outputs: list[str] = []
     is_stub_test: bool = False
     derivation_script: str | None = None

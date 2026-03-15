@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from typing import Any
 
 import anthropic
 from rich.console import Console
@@ -166,7 +167,7 @@ def _validate_process_name(
     return expected
 
 
-def _parse_response(text: str, func: FunctionalitySpec) -> dict:
+def _parse_response(text: str, func: FunctionalitySpec) -> dict[str, Any]:
     text = text.strip()
     if text.startswith("```"):
         lines = text.splitlines()
@@ -174,7 +175,7 @@ def _parse_response(text: str, func: FunctionalitySpec) -> dict:
         if lines and lines[-1].strip() == "```":
             lines = lines[:-1]
         text = "\n".join(lines)
-    return json.loads(text)
+    return dict(json.loads(text))
 
 
 def _enforce_meta_convention(inputs: list[ChannelSpec]) -> list[ChannelSpec]:
@@ -230,7 +231,7 @@ def _apply_meta_invariant(spec: ModuleSpec) -> ModuleSpec:
     return spec.model_copy(update={"inputs": _enforce_meta_convention(spec.inputs)})
 
 
-def _json_to_module_spec(data: dict, func: FunctionalitySpec, tier: int) -> ModuleSpec:
+def _json_to_module_spec(data: dict[str, Any], func: FunctionalitySpec, tier: int) -> ModuleSpec:
     tool_name = str(data.get("tool_name", func.name.lower()))
     raw_pn = str(data.get("process_name", f"{tool_name.upper()}_{func.name.upper()}"))
     process_name = _validate_process_name(raw_pn, func, tool_name)
@@ -273,7 +274,7 @@ async def infer_module_spec(
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_prompt}],
         )
-        text = message.content[0].text
+        text = message.content[0].text  # type: ignore[union-attr]
         data = _parse_response(text, func)
         spec = _json_to_module_spec(data, func, tier)
     except (_AnthropicAPIError, TypeError) as e:
@@ -311,7 +312,8 @@ async def infer_all(
             _infer_console.print(f"[yellow]⚠ Inference exception for {func.name}: {result}[/yellow]")
             specs.append(_apply_meta_invariant(ModuleSpec.tier5_stub(func.name, infer_failed=True)))
         else:
-            specs.append(result)  # type: ignore[arg-type]  already enforced by infer_module_spec
+            assert isinstance(result, ModuleSpec)
+            specs.append(result)
     return specs
 
 

@@ -14,13 +14,10 @@ import pytest
 
 from code_to_module.validate import (
     FixClass,
-    LintFailure,
-    NfTestFailure,
     TestReport,
     _classify_lint,
     _classify_nftest,
     _parse_lint_json,
-    _parse_nftest_output,
     run_validation,
 )
 

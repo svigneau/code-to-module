@@ -14,7 +14,7 @@ import re
 import subprocess
 from enum import Enum
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 from rich.console import Console
@@ -193,7 +193,7 @@ def _parse_lint_json(raw_json: str) -> list[LintFailure]:
     failures: list[LintFailure] = []
     # nf-core lint JSON shape: {"lint_results": {"failed": [{"check_name": ..., "message": ...}]}}
     # Also handle flat list format
-    failed_entries: list[dict] = []
+    failed_entries: list[dict[str, Any]] = []
 
     if isinstance(data, dict):
         results = data.get("lint_results", data)

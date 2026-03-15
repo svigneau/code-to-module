@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
@@ -190,7 +191,7 @@ def convert(
         sys.exit(1)
 
 
-def _print_api_summary(result: dict, outdir_path: Path, console: Console) -> None:
+def _print_api_summary(result: dict[str, Any], outdir_path: Path, console: Console) -> None:
     lines: list[str] = []
 
     generated_mods = [m for m in result["modules"] if m["files_created"]]
@@ -277,7 +278,7 @@ def assess_only(
     with console.status("Scanning for functionalities..."):
         disc_result = _discover.discover(code_source)
 
-    results: list[dict] = []
+    results: list[dict[str, Any]] = []
     for func in disc_result.functionalities:
         func_tier, confidence, warns = _assess.assess(
             func, code_source, console if not output_json else None

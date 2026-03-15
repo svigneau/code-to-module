@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
@@ -21,7 +21,7 @@ class DerivationPlan(BaseModel):
     strategy: Literal["derive", "chain", "stub"]
     format_tag: str
     template_name: str | None = None
-    template_vars: dict = {}
+    template_vars: dict[str, Any] = {}
     output_files: list[str] = []
     tool_requirements: list[str] = []
     setup_module: str | None = None

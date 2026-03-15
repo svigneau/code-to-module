@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel
 from rich.console import Console
@@ -54,7 +54,7 @@ def _read(path: Path) -> str:
         return ""
 
 
-def _load_yaml(path: Path) -> dict | None:
+def _load_yaml(path: Path) -> dict[str, Any] | None:
     """Parse a YAML file with ruamel. Returns None on failure."""
     try:
         from ruamel.yaml import YAML
@@ -117,7 +117,7 @@ def _tool_from_container(main_nf: str) -> str:
     return ""
 
 
-def _meta_yml_channel_names(meta_yml: dict) -> tuple[list[str], list[str]]:
+def _meta_yml_channel_names(meta_yml: dict[str, Any]) -> tuple[list[str], list[str]]:
     """Return (input_names, output_names) from meta.yml (excluding 'meta' and 'versions')."""
     def _names(section: str) -> list[str]:
         entries = meta_yml.get(section) or []

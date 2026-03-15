@@ -14,6 +14,7 @@ import difflib
 import re
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 import anthropic
 from pydantic import BaseModel
@@ -131,7 +132,7 @@ def _apply_unified_diff(original: str, unified_diff: str) -> str | None:
 # ── YAML helpers ───────────────────────────────────────────────────────────────
 
 
-def _load_meta_yml_raw(module_path: Path) -> tuple[dict, str] | tuple[None, None]:
+def _load_meta_yml_raw(module_path: Path) -> tuple[dict[str, Any], str] | tuple[None, None]:
     """Load meta.yml and return (parsed_dict, raw_text). Returns (None, None) on failure."""
     meta_file = module_path / "meta.yml"
     if not meta_file.exists():
@@ -379,7 +380,7 @@ def _llm_call(system: str, user: str) -> str:
         system=system,
         messages=[{"role": "user", "content": user}],
     )
-    return response.content[0].text.strip()
+    return response.content[0].text.strip()  # type: ignore[union-attr]
 
 
 def _llm_fix_output_pattern(

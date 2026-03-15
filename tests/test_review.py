@@ -9,9 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
-from code_to_module.review import ReviewItem, ReviewReport, review_module
+from code_to_module.review import ReviewReport, review_module
 from code_to_module.standards.loader import Standards
 
 # ── Fixture paths ──────────────────────────────────────────────────────────────

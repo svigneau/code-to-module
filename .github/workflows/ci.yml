@@ -44,4 +44,4 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: pip install -e ".[dev]"
-      - run: pytest tests/ -v --tb=short
+      - run: pytest tests/ -v --tb=short -m "not regression and not llm and not network"

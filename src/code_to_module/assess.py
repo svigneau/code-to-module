@@ -192,24 +192,24 @@ def assess(
                 has_optional = bool(_OPTIONAL_FLAG_RE.search(code))
                 in_biotools = _check_biotools(tool)
 
-                complex_reasons: list[str] = []
+                tool_complex_reasons: list[str] = []
                 if output_count > 1:
-                    complex_reasons.append(
+                    tool_complex_reasons.append(
                         f"multiple output patterns detected ({output_count})"
                     )
                 if has_optional:
-                    complex_reasons.append("optional flags present")
+                    tool_complex_reasons.append("optional flags present")
                 if in_biotools:
-                    complex_reasons.append(f"'{tool}' is in bio.tools registry")
+                    tool_complex_reasons.append(f"'{tool}' is in bio.tools registry")
 
-                if not complex_reasons:
+                if not tool_complex_reasons:
                     # Tier 1
                     conf = max(0.90, func.confidence)
                     _print_panel(console, func, 1, conf, [])
                     return 1, conf, []
                 else:
                     # Tier 2 (complexity present)
-                    warnings.extend(complex_reasons)
+                    warnings.extend(tool_complex_reasons)
                     conf = max(0.75, min(func.confidence, 0.89))
                     _print_panel(console, func, 2, conf, warnings)
                     return 2, conf, warnings

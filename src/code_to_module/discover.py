@@ -247,7 +247,7 @@ def _parse_pyproject_toml(pyproject: Path) -> list[str]:
             import tomllib  # Python 3.11+
         except ImportError:
             try:
-                import tomli as tomllib  # type: ignore[no-redef]
+                import tomli as tomllib
             except ImportError:
                 return []
         data = tomllib.loads(pyproject.read_text(encoding="utf-8", errors="replace"))
@@ -919,7 +919,7 @@ def _run_llm(source: CodeSource) -> list[FunctionalitySpec]:
             system=system,
             messages=[{"role": "user", "content": user}],
         )
-        text = response.content[0].text
+        text = response.content[0].text  # type: ignore[union-attr]
         specs = _parse_llm_response(text)
         if source.doc_sources:
             specs = _apply_doc_bonus(specs, source)
