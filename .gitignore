@@ -29,6 +29,9 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
+# MkDocs build output
+site/
+
 # Project-specific
 debug_log.txt
 
