@@ -25,17 +25,23 @@ validate-module review modules/celltypist/
 ## How it works
 
 ```mermaid
-flowchart LR
-    A[Script or repo] --> B[ingest]
-    B --> C[discover]
-    C --> D[assess tier]
-    D --> E[infer with Claude]
-    E --> F[generate module]
-    F --> G[validate-module test]
-    G --> H{failures?}
-    H -- yes --> I[validate-module fix]
-    I --> G
-    H -- no --> J[validate-module review]
+flowchart TD
+    subgraph pipeline ["code-to-module convert"]
+        A[Script or repo] --> B[Ingest]
+        B --> C[Discover functionalities]
+        C --> D[Assess tier]
+        D --> E[Infer with Claude]
+        E --> F[Generate module files]
+    end
+
+    subgraph validate ["validate-module"]
+        G[test] --> H{failures?}
+        H -- yes --> I[fix]
+        I --> G
+        H -- no --> J[review]
+    end
+
+    F --> G
     J --> K[Submit PR to nf-core]
 ```
 
