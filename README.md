@@ -4,7 +4,7 @@ Convert scripts and Git repositories into submission-ready nf-core modules.
 
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 ![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)
-![CI](https://github.com/your-org/code-to-module/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/svigneau/code-to-module/actions/workflows/ci.yml/badge.svg)
 
 ## Overview
 
