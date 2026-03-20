@@ -29,9 +29,9 @@ nav:
   - Home: index.md
   - User Guide: user-guide.md
   - CLI Reference: cli-reference.md
-  - Known Limitations: known-limitations.md
-  - Contributing: contributing.md
   - Architecture: architecture.md
+  - Contributing: contributing.md
+  - Known Limitations: known-limitations.md
 
   # development-tutorial.md is gitignored — not part of the public site
 
