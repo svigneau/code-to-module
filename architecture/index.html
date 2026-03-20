@@ -1,0 +1,1264 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="LLM-assisted nf-core module generation from scripts and repos">
+      
+      
+      
+      
+        <link rel="prev" href="../cli-reference/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Architecture - code-to-module</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="code-to-module" class="md-header__button md-logo" aria-label="code-to-module" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            code-to-module
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/svigneau/code-to-module" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code-to-module
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../user-guide/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  User Guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../cli-reference/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI Reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../known-limitations/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Known Limitations
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="code-to-module" class="md-nav__button md-logo" aria-label="code-to-module" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    code-to-module
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/svigneau/code-to-module" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    code-to-module
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../user-guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-tool-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this tool does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-conversion-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The conversion pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-validation-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The validation pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-import-boundary-critical-for-contributors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The import boundary (critical for contributors)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nf-core-conventions-enforced-by-the-generator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nf-core conventions enforced by the generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-standards-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The standards schema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-data-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test data strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a new feature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-limitations-and-planned-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations and planned improvements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../known-limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Known Limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-tool-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this tool does
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Module map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-conversion-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The conversion pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-validation-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The validation pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-import-boundary-critical-for-contributors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The import boundary (critical for contributors)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nf-core-conventions-enforced-by-the-generator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nf-core conventions enforced by the generator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-standards-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The standards schema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-data-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test data strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-a-new-feature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding a new feature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-limitations-and-planned-improvements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known limitations and planned improvements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture">Architecture</h1>
+<h2 id="what-this-tool-does">What this tool does</h2>
+<p><code>code-to-module</code> converts a script or Git repository into a submission-ready
+nf-core module directory. The conversion pipeline is a linear sequence: ingest the
+source, discover distinct CLI entry points, assess complexity, call Claude to infer
+channel names and the shell command, resolve a container, choose a test data strategy,
+and render the module files from Jinja2 templates. The result is a <code>main.nf</code>,
+<code>meta.yml</code>, <code>environment.yml</code>, and nf-test spec that the author reviews before
+submitting to nf-core.</p>
+<p>The tool is LLM-assisted, not fully autonomous. Claude handles only the inference
+step — reading source code and optional documentation to determine what the module's
+inputs, outputs, and shell command should be. Everything else is deterministic: rule-
+based discovery, API-backed container resolution, schema-driven generation. The output
+is best-effort; structural invariants (meta as first input, eval() version capture,
+ext.args wiring) are enforced by post-processing guards, but output glob patterns and
+process labels need human review before submission.</p>
+<h2 id="module-map">Module map</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Key exports</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ingest.py</code></td>
+<td>Accepts file paths, directories, Git URLs; fetches <code>--docs</code> content</td>
+<td><code>ingest() → CodeSource</code></td>
+</tr>
+<tr>
+<td><code>discover.py</code></td>
+<td>Rule-based then LLM-based functionality detection; interactive selection UI</td>
+<td><code>discover(), select_functionalities() → DiscoveryResult</code></td>
+</tr>
+<tr>
+<td><code>assess.py</code></td>
+<td>Assigns Tier 1–5 complexity to each FunctionalitySpec</td>
+<td><code>assess() → (tier, confidence, warnings)</code></td>
+</tr>
+<tr>
+<td><code>infer.py</code></td>
+<td>Calls Claude API on one FunctionalitySpec; enforces post-processing invariants</td>
+<td><code>infer() → ModuleSpec</code></td>
+</tr>
+<tr>
+<td><code>container.py</code></td>
+<td>Two-phase: discover all container options in parallel, then select one</td>
+<td><code>discover(), select() → ContainerOption</code></td>
+</tr>
+<tr>
+<td><code>bioconda.py</code></td>
+<td>Checks Bioconda for existing packages; generates meta.yaml recipe scaffolds</td>
+<td><code>check_bioconda(), generate_recipe()</code></td>
+</tr>
+<tr>
+<td><code>test_data_match.py</code></td>
+<td>Strategy 1: matches channel specs to nf-core/test-datasets files</td>
+<td><code>match_test_data() → list[ChannelTestData]</code></td>
+</tr>
+<tr>
+<td><code>test_data_derive.py</code></td>
+<td>Strategies 2a/2b: derives test data or chains an upstream nf-core module</td>
+<td><code>derive_test_data(), chain_test_data()</code></td>
+</tr>
+<tr>
+<td><code>test_gen.py</code></td>
+<td>Orchestrates test data strategy selection; produces TestSpec and <code>derive_test_data.sh</code></td>
+<td><code>generate_test_spec() → TestSpec</code></td>
+</tr>
+<tr>
+<td><code>generate.py</code></td>
+<td>Renders Jinja2 templates into module files; applies post-processing fixes</td>
+<td><code>generate_module() → list[Path]</code></td>
+</tr>
+<tr>
+<td><code>quick_lint.py</code></td>
+<td>Fast structural checks after generation (no subprocess)</td>
+<td><code>quick_lint() → list[LintWarning]</code></td>
+</tr>
+<tr>
+<td><code>validate.py</code></td>
+<td>Runs <code>nf-core modules lint</code> and <code>nf-test</code>; classifies failures A/B/C</td>
+<td><code>run_validation() → TestReport</code></td>
+</tr>
+<tr>
+<td><code>fix.py</code></td>
+<td>Proposes rule-based (A) and LLM-assisted (B) fixes as diffs; applies on approval</td>
+<td><code>propose_fixes(), apply_approved_fixes()</code></td>
+</tr>
+<tr>
+<td><code>review.py</code></td>
+<td>Static analysis against nf-core style conventions</td>
+<td><code>review_module() → ReviewReport</code></td>
+</tr>
+<tr>
+<td><code>models.py</code></td>
+<td>All Pydantic v2 data models shared across the pipeline</td>
+<td><code>CodeSource, ModuleSpec, TestSpec, ContainerOption, …</code></td>
+</tr>
+<tr>
+<td><code>api.py</code></td>
+<td>Clean programmatic API wrapping the full pipeline; no Rich output</td>
+<td><code>convert() → dict</code></td>
+</tr>
+<tr>
+<td><code>cli.py</code></td>
+<td><code>code-to-module</code> Click group: convert, assess-only, containers, bioconda-recipe, update-standards</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>validate_cli.py</code></td>
+<td><code>validate-module</code> Click group: test, fix, review</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>regression.py</code></td>
+<td>Parses generated modules and scores them against nf-core reference modules</td>
+<td><code>parse_module(), score_module()</code></td>
+</tr>
+<tr>
+<td><code>standards/loader.py</code></td>
+<td>Loads and caches <code>nf_core_standards.json</code>; exposes the Standards singleton</td>
+<td><code>get_standards() → Standards</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-conversion-pipeline">The conversion pipeline</h2>
+<pre class="mermaid"><code>flowchart TD
+    subgraph convert ["code-to-module convert"]
+        A[script or repo] --&gt; B[ingest]
+        B --&gt; C[discover]
+        C --&gt; D{≥2 functionalities?}
+        D -- yes --&gt; E[selection UI]
+        D -- no --&gt; F[assess]
+        E --&gt; F
+        F --&gt; G[infer via Claude]
+        G --&gt; H[container discovery]
+        H --&gt; I[container selection]
+        I --&gt; J[test data strategy]
+        J --&gt; K[generate]
+        K --&gt; L[quick_lint]
+    end
+
+    subgraph validate ["validate-module"]
+        M[test] --&gt; N{failures?}
+        N -- yes --&gt; O[fix]
+        O --&gt; M
+        N -- no --&gt; P[review]
+    end
+
+    L --&gt; M
+    P --&gt; Q[submit PR to nf-core]</code></pre>
+<p><strong>ingest</strong> accepts a local file path, directory, or Git URL, clones if necessary, and
+builds a <code>CodeSource</code> containing the repo manifest and any documentation fetched via
+<code>--docs</code>. It also parses <code>--existing-modules</code> directories so downstream stages can
+align container URLs and channel conventions to modules already in use.</p>
+<p><strong>discover</strong> is deliberately split from assess and infer. Rule-based detectors run
+first (Click/Typer decorators, argparse subparsers, shell <code>case</code> dispatch, multiple
+top-level scripts) because they are fast and deterministic. The LLM fallback only fires
+when rule-based detection finds zero or one functionality. This keeps discovery
+reproducible: two runs on the same repo produce the same <code>FunctionalitySpec</code> list
+regardless of LLM non-determinism.</p>
+<p><strong>assess</strong> assigns a complexity tier (1–5) to each <code>FunctionalitySpec</code>. Tier drives
+the default container strategy and determines how much of the module can be completed
+automatically — Tier 5 means generation cannot proceed and the user is told why.</p>
+<p><strong>infer</strong> is the only step that calls the Claude API. It sends the relevant code
+section plus any documentation to Claude and receives back channel names, types, and
+the shell command. Post-processing guards then enforce structural invariants that Claude
+is not expected to get right every time: <code>val(meta)</code> as the first input, the <code>eval()</code>
+version capture pattern, and no <code>TODO</code> placeholders in required fields.</p>
+<p><strong>container discovery and selection</strong> run as two separate phases. Discovery runs all
+checks in parallel (Dockerfile in repo, <code>environment.yml</code>, <code>requirements.txt</code>,
+Singularity.def, Bioconda/BioContainers API) and collects every available option. No
+check is skipped because a better one was found. Selection then applies the tier-aware
+default order — BioContainers ranks first for Tier 1–2 tools, repo files rank first for
+Tier 3–5 — or presents an interactive menu on a TTY.</p>
+<p><strong>test data strategy</strong> tries four strategies in priority order until one succeeds for
+each input channel. See <a href="#test-data-strategies">Test data strategies</a> below.</p>
+<p><strong>generate</strong> renders the module files from Jinja2 templates, then <strong>quick_lint</strong> runs
+a fast structural check in-process. Any warnings are surfaced in the CLI summary
+without requiring <code>nf-core lint</code> to be installed.</p>
+<h2 id="the-validation-pipeline">The validation pipeline</h2>
+<p><code>validate-module test</code> runs <code>nf-core modules lint</code> and <code>nf-test</code> against a module
+directory, captures their output, and classifies each failure into one of three
+classes. <strong>Class A</strong> failures have deterministic structure — wrong emit name, missing
+<code>topic: versions</code> tag, container URL prefix error, missing <code>ext.args</code> pattern — and
+can be fixed by a deterministic rule. <strong>Class B</strong> failures require reading the module
+in context — wrong output glob, wrong process label — and are addressed by an
+LLM-assisted fix with a lower trust signal. <strong>Class C</strong> failures cannot be resolved
+automatically; the tool explains what is wrong and stops.</p>
+<p><code>validate-module fix</code> presents each fixable failure as a coloured diff panel labelled
+with its source (<code>[rule]</code> or <code>[llm]</code>) and waits for explicit approval before writing
+anything. This is non-negotiable: silent file modification would make the fix command
+a liability rather than an aid. After applying approved fixes, validation re-runs
+automatically to confirm the failures are resolved.</p>
+<p><code>validate-module review</code> performs static analysis only — no subprocess calls, no
+nf-test execution. It checks channel naming conventions, process label
+appropriateness, <code>ext.args</code> usage, <code>meta.yml</code> completeness, versions channel structure,
+and EDAM ontology coverage, returning a <code>ReviewReport</code> with ERROR / WARNING / INFO
+severity levels.</p>
+<h2 id="the-import-boundary-critical-for-contributors">The import boundary (critical for contributors)</h2>
+<p>The codebase is split into two strictly separated halves:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌─────────────────────────────────┐   ┌──────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│     Conversion pipeline         │   │      Validation suite            │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                                 │   │                                  │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│  ingest → discover → assess     │   │  validate.py                     │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  → infer → container            │   │  fix.py                          │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  → test_gen → generate          │   │  review.py                       │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│                                 │   │  validate_cli.py                 │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  cli.py  api.py                 │   │                                  │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>└─────────────────────────────────┘   └──────────────────────────────────┘
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>         ↑                                        ↑
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>         │            standards/                  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>         └──────────── (shared) ─────────────────┘
+</code></pre></div>
+<p><code>validate_cli.py</code> must never import from <code>ingest</code>, <code>discover</code>, <code>assess</code>, <code>infer</code>,
+<code>container</code>, <code>test_gen</code>, or <code>generate</code>. <code>standards/</code> must never import from any
+sibling module in either half. This boundary exists so the validation suite can be
+extracted into a standalone <code>nf-module-tools</code> package later without renaming
+anything. A test enforces it: <code>pytest tests/test_import_boundaries.py</code>. If you add
+an import and this test fails, the boundary has been violated — restructure rather
+than loosen the rule.</p>
+<h2 id="nf-core-conventions-enforced-by-the-generator">nf-core conventions enforced by the generator</h2>
+<p>These are applied automatically. Contributors do not need to implement them manually,
+but should know they exist when reviewing generated output.</p>
+<table>
+<thead>
+<tr>
+<th>Convention</th>
+<th>Where enforced</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>val(meta)</code> as first input channel</td>
+<td><code>infer.py</code> post-processing guard</td>
+<td>nf-core module template</td>
+</tr>
+<tr>
+<td><code>eval()</code> version capture pattern</td>
+<td><code>main.nf.j2</code> template</td>
+<td>fastqc, samtools/sort modules</td>
+</tr>
+<tr>
+<td>Both Singularity and Docker container URLs</td>
+<td><code>container.py</code> + <code>main.nf.j2</code></td>
+<td>nf-core container policy</td>
+</tr>
+<tr>
+<td><code>topic: versions</code> on versions output channel</td>
+<td><code>main.nf.j2</code> template</td>
+<td>nf-core 3.5+ convention</td>
+</tr>
+<tr>
+<td>All params via <code>ext.args</code> (none hardcoded)</td>
+<td><code>main.nf.j2</code> template</td>
+<td>nf-core module guidelines</td>
+</tr>
+</tbody>
+</table>
+<p>Full specification: <a href="https://nf-co.re/docs/guidelines/components/modules">nf-co.re/docs/guidelines/components/modules</a></p>
+<h2 id="the-standards-schema">The standards schema</h2>
+<p><code>src/code_to_module/standards/data/nf_core_standards.json</code> is the single source of
+truth for all nf-core conventions used by the generator — valid process labels,
+container registry URLs, required <code>meta.yml</code> fields, EDAM ontology mappings, test
+dataset paths, and derivation templates. Nothing in Python code or Jinja2 templates
+should hardcode an nf-core convention directly; it must come from the schema via
+<code>get_standards()</code>. This makes convention updates a one-file change. To update the
+bundled schema, edit <code>nf_core_standards.json</code>, bump <code>schema_version</code>, add an entry
+to <code>STANDARDS_CHANGELOG.md</code>, and run <code>code-to-module update-standards</code> to check
+whether the remote schema has a newer version.</p>
+<h2 id="test-data-strategies">Test data strategies</h2>
+<p>The generator tries strategies in this order and stops at the first match for each
+input channel.</p>
+<table>
+<thead>
+<tr>
+<th>Strategy</th>
+<th>When used</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 — Match</td>
+<td>A file of the right format already exists in nf-core/test-datasets</td>
+<td>Path reference in <code>main.nf.test</code></td>
+</tr>
+<tr>
+<td>2a — Derive</td>
+<td>No exact match; file can be subsetted or transformed from existing nf-core data</td>
+<td><code>derive_test_data.sh</code> + path reference</td>
+</tr>
+<tr>
+<td>2b — Chain</td>
+<td>Input is the natural output of a known upstream nf-core module</td>
+<td><code>setup {}</code> block in <code>main.nf.test</code></td>
+</tr>
+<tr>
+<td>3 — Stub</td>
+<td>Data is too large, proprietary, or cannot be derived</td>
+<td><code>stub:</code> block; tests run with <code>nf-test --stub</code></td>
+</tr>
+</tbody>
+</table>
+<p>Derive (2a) is intentionally ranked above chain (2b). A stored file keeps CI test
+runtime predictable; a <code>setup {}</code> block runs an upstream module on every test
+invocation, adding latency that nf-core reviewers notice.</p>
+<h2 id="adding-a-new-feature">Adding a new feature</h2>
+<p>The most common contribution patterns, in order:</p>
+<ol>
+<li>
+<p><strong>Adding a new review check</strong> — add a function to <code>review.py</code> that accepts a
+   module path and <code>Standards</code> object and returns a list of <code>ReviewItem</code>. Add the
+   function to the <code>review_module()</code> call chain. Write a test in <code>tests/test_review.py</code>
+   covering both the pass and fail cases.</p>
+</li>
+<li>
+<p><strong>Adding a new generated file</strong> — add a <code>.j2</code> template to
+   <code>src/code_to_module/templates/</code>. Add any new data fields to the relevant Pydantic
+   model in <code>models.py</code>. Update <code>generate.py</code> to render the template. Add a test
+   fixture and a test in <code>tests/test_generate.py</code> that asserts the file is written and
+   contains the expected content.</p>
+</li>
+<li>
+<p><strong>Extending the standards schema</strong> — add the new convention to
+   <code>src/code_to_module/standards/data/nf_core_standards.json</code>. Bump <code>schema_version</code>.
+   Add a changelog entry in <code>STANDARDS_CHANGELOG.md</code>. Update any code that reads from
+   the schema to use the new field via <code>get_standards()</code>. Never duplicate the value
+   in Python code.</p>
+</li>
+<li>
+<p><strong>All of the above</strong> — run <code>pytest -x -q -m "not network and not llm"</code> after each
+   step, and <code>pytest tests/test_import_boundaries.py</code> before opening a PR.</p>
+</li>
+</ol>
+<h2 id="known-limitations-and-planned-improvements">Known limitations and planned improvements</h2>
+<ul>
+<li><strong>Library-only tools</strong> with no CLI entry point (e.g. tools designed to be called as
+  <code>import foo; foo.run(...)</code>) are not yet supported — discovery finds no entry points
+  and generation stops. A <code>library-to-module</code> path that generates a CLI wrapper first
+  is planned.</li>
+<li><strong>Perl wrappers and non-Python CLI tools</strong> (TrimGalore, for example) have no Python
+  AST to analyse and tend to assess as Tier 4–5. The tool reports the tier honestly
+  rather than producing a misleading partial module.</li>
+<li><strong>Domain-specific test data</strong> (<code>.h5ad</code>, <code>.pkl</code>, <code>.mzML</code>, large databases) is not in
+  nf-core/test-datasets, so those input channels fall back to stub strategy. The
+  generated test is syntactically valid but cannot test real data flow.</li>
+</ul>
+<p>Open issues and the development roadmap are tracked at
+<a href="https://github.com/svigneau/code-to-module/issues">github.com/svigneau/code-to-module/issues</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
