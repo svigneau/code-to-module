@@ -22,7 +22,7 @@
     `import foo; foo.run(...)` rather than `foo --input file --output dir`.
 
     Library-to-module support is planned — see the
-    [development tutorial](development-tutorial.md) for the proposed
+    [architecture doc](architecture.md) for the proposed
     architecture. The intended approach is to generate a thin CLI wrapper
     script first, then feed that into the standard conversion pipeline.
 

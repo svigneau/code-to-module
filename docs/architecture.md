@@ -46,18 +46,30 @@ process labels need human review before submission.
 ## The conversion pipeline
 
 ```mermaid
-flowchart LR
-    A[ingest] --> B[discover]
-    B --> C{≥2 functionalities?}
-    C -- yes --> D[selection UI]
-    C -- no --> E[assess]
-    D --> E
-    E --> F[infer via Claude]
-    F --> G[container discovery]
-    G --> H[container selection]
-    H --> I[test data strategy]
-    I --> J[generate module files]
-    J --> K[quick_lint]
+flowchart TD
+    subgraph convert ["code-to-module convert"]
+        A[ingest] --> B[discover]
+        B --> C{≥2 functionalities?}
+        C -- yes --> D[selection UI]
+        C -- no --> E[assess]
+        D --> E
+        E --> F[infer via Claude]
+        F --> G[container discovery]
+        G --> H[container selection]
+        H --> I[test data strategy]
+        I --> J[generate]
+        J --> K[quick_lint]
+    end
+
+    subgraph validate ["validate-module"]
+        L[test] --> M{failures?}
+        M -- yes --> N[fix]
+        N --> L
+        M -- no --> O[review]
+    end
+
+    K --> L
+    O --> P[Submit PR to nf-core]
 ```
 
 **ingest** accepts a local file path, directory, or Git URL, clones if necessary, and
