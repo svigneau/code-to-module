@@ -31,7 +31,9 @@ nav:
   - CLI Reference: cli-reference.md
   - Known Limitations: known-limitations.md
   - Contributing: contributing.md
-  - Development Tutorial: development-tutorial.md
+  - Architecture: architecture.md
+
+  # development-tutorial.md is gitignored — not part of the public site
 
 plugins:
   - search

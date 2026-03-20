@@ -56,7 +56,7 @@
 ## Planned improvements
 
 The following are known future directions. Contributions are welcome — see
-[GitHub Issues](https://github.com/your-org/code-to-module/issues) for open items.
+[GitHub Issues](https://github.com/svigneau/code-to-module/issues) for open items.
 
 - **Library-to-module:** generate a CLI wrapper for library-only Python tools, then
   pipe the result through the standard conversion pipeline.
