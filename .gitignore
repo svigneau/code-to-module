@@ -38,5 +38,6 @@ debug_log.txt
 
 # Devcontainer local overrides
 .devcontainer/*.local.json
-docs/development-tutorial.md
+docs/development-tutorial-1.md
+docs/development-tutorial-2.md
 site/
