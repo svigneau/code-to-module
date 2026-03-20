@@ -69,7 +69,7 @@ flowchart TD
     end
 
     K --> L
-    O --> P[Submit PR to nf-core]
+    O --> P[submit PR to nf-core]
 ```
 
 **ingest** accepts a local file path, directory, or Git URL, clones if necessary, and

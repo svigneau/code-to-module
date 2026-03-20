@@ -25,9 +25,9 @@ validate-module review modules/celltypist/
 ## How it works
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph pipeline ["code-to-module convert"]
-        A[Script or repo] --> B[ingest]
+        A[script or repo] --> B[ingest]
         B --> C[discover]
         C --> D[assess tier]
         D --> E[infer with Claude]
@@ -42,7 +42,7 @@ flowchart LR
     end
 
     F --> G
-    J --> K[Submit PR to nf-core]
+    J --> K[submit PR to nf-core]
 ```
 
 ## Where to go next
