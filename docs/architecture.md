@@ -48,28 +48,29 @@ process labels need human review before submission.
 ```mermaid
 flowchart TD
     subgraph convert ["code-to-module convert"]
-        A[ingest] --> B[discover]
-        B --> C{≥2 functionalities?}
-        C -- yes --> D[selection UI]
-        C -- no --> E[assess]
-        D --> E
-        E --> F[infer via Claude]
-        F --> G[container discovery]
-        G --> H[container selection]
-        H --> I[test data strategy]
-        I --> J[generate]
-        J --> K[quick_lint]
+        A[script or repo] --> B[ingest]
+        B --> C[discover]
+        C --> D{≥2 functionalities?}
+        D -- yes --> E[selection UI]
+        D -- no --> F[assess]
+        E --> F
+        F --> G[infer via Claude]
+        G --> H[container discovery]
+        H --> I[container selection]
+        I --> J[test data strategy]
+        J --> K[generate]
+        K --> L[quick_lint]
     end
 
     subgraph validate ["validate-module"]
-        L[test] --> M{failures?}
-        M -- yes --> N[fix]
-        N --> L
-        M -- no --> O[review]
+        M[test] --> N{failures?}
+        N -- yes --> O[fix]
+        O --> M
+        N -- no --> P[review]
     end
 
-    K --> L
-    O --> P[submit PR to nf-core]
+    L --> M
+    P --> Q[submit PR to nf-core]
 ```
 
 **ingest** accepts a local file path, directory, or Git URL, clones if necessary, and
